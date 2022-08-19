@@ -9,7 +9,7 @@ const ToDo = () => {
   const [enterContent, setEnterContent] = useState("");
   const [enterDate, setEnterDate] = useState("");
 
-  const [storeValue, setStoreValue] = useState([{}]);
+  const [storeValue, setStoreValue] = useState([]);
 
   const enterContentHandler = (e) => {
     setEnterContent(e.target.value);
@@ -20,11 +20,21 @@ const ToDo = () => {
   };
 
   const storeValueHandler = () => {
-    setStoreValue([...storeValue, { Content: enterContent, Date: enterDate }]);
+    setStoreValue([
+      ...storeValue,
+      { ID: Date.now(), Content: enterContent, Date: enterDate },
+    ]);
+    setEnterContent([]);
   };
 
-  const deleteItem = () => {
-    setStoreValue([...storeValue]);
+  // const deleteItem = () => {
+  //   setStoreValue([...storeValue]);
+  // };
+
+  const deleteItemHandler = (itemState) => () => {
+    console.log(itemState);
+    const currentState = storeValue.filter((item) => item.ID !== itemState.ID);
+    setStoreValue(currentState);
   };
 
   return (
@@ -69,13 +79,14 @@ const ToDo = () => {
               {storeValue.map((st, index) => {
                 return (
                   <tr key={index}>
+                    <td>{index + 1}</td>
                     <td>{st.Content}</td>
                     <td>{st.Date}</td>
                     <td>
-                      <button onClick={deleteItem}>
+                      <button>
                         <CheckIcon />
                       </button>
-                      <button onClick={deleteItem}>
+                      <button onClick={deleteItemHandler(st)}>
                         <ClearIcon />
                       </button>
                     </td>

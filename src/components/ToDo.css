@@ -1,10 +1,13 @@
 .toDo {
     background-color: #2c3e50;
     width: 500px;
+    max-width: 500px;
+    min-width: 500px;
     height: 500px;
     border-radius: 20px;
     margin-top: 100px;
     color: #fff;
+    overflow: scroll;
 }
 
 .header__icon {
@@ -23,11 +26,28 @@
 
 .header__table {
     margin-top: 30px;
-    display: flex;
-    justify-content: center;
+    
+    
 }
 
-.header__table table tr {
-    display: flex;
-    justify-content: space-between;
+.header__table table  {
+    
+    /* min-width: 400px;
+    max-width: 500px; */
+    width: 100%;
+    
+}
+
+.header__table table tr th {
+    border-right: 1px solid #fff;
+}
+
+.header__table table tr td {
+    border-bottom: 1px solid #fff;
+    padding: 20px 0 0 20px;
+}
+
+.header__table table tr:hover {
+    background-color: black;
+    transition: 0.5s background-color;
 }
