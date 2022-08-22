@@ -1,54 +1,54 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { useNavigate, NavLink } from "react-router-dom";
+import axios from "axios";
 
 import "./Register.css";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
 const Register = () => {
-  let navigate = useNavigate();
+  const navigate = useNavigate();
 
-  const [username, setUsername] = useState("");
+  // const [user, setUser] = useState({
+  //   name: "",
+  //   email: "",
+  //   password: "",
+  //   age: "",
+  // });
+
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [age, setAge] = useState(0);
+  const [age, setAge] = useState("");
 
-  useEffect(() => {
-    if (localStorage.getItem("user-info")) {
-      navigate("/login");
-    }
-  }, [navigate]);
-
-  async function handleSubmit(e) {
+  const addData = async (e) => {
     e.preventDefault();
 
-    let results = await axios
+    //const { name, email, password, age } = user;
+
+    axios
       .post("https://api-nodejs-todolist.herokuapp.com/user/register", {
-        name: username,
+        name: name,
         email: email,
         password: password,
         age: age,
       })
-      .then(function (res) {
+      .then((res) => {
         console.log(res);
-      })
-      .catch(function (error) {
-        console.log(error);
+        console.log(res.data);
+        navigate("/login");
+        localStorage.setItem("token", res.data.token);
       });
-
-    localStorage.setItem("user-info", JSON.stringify(results));
-    navigate("/");
-  }
+  };
 
   return (
     <div className="container">
       <h1>Register</h1>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={(e) => addData(e)}>
         <div className="form-control">
           <input
             type="text"
-            id="username"
-            placeholder="Enter username"
-            onChange={(e) => setUsername(e.target.value)}
+            id="name"
+            placeholder="Username"
+            onChange={(e) => setName(e.target.value)}
           />
           <span></span>
         </div>
@@ -56,7 +56,7 @@ const Register = () => {
           <input
             type="email"
             id="email"
-            placeholder="Enter email"
+            placeholder="Email"
             onChange={(e) => setEmail(e.target.value)}
           />
           <span></span>
@@ -65,7 +65,7 @@ const Register = () => {
           <input
             type="password"
             id="password"
-            placeholder="Enter password"
+            placeholder="Password"
             onChange={(e) => setPassword(e.target.value)}
           />
           <span></span>
@@ -74,13 +74,19 @@ const Register = () => {
           <input
             type="number"
             id="age"
-            placeholder="Enter age"
+            placeholder="Age"
             onChange={(e) => setAge(e.target.value)}
           />
           <span></span>
         </div>
+
         <input type="submit" value="Register" />
-        <div className="signup_route">Not a new member?</div>
+        <div className="signup">
+          Not a new member?
+          <button>
+            <NavLink to="/login">Sign up</NavLink>
+          </button>
+        </div>
       </form>
     </div>
   );

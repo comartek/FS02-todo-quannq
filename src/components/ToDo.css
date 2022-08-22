@@ -1,13 +1,34 @@
-.toDo {
-    background-color: #2c3e50;
-    width: 700px;
-    max-width: 800px;
+.header {
+    /* position: absolute;
+    top: 50%;
+    left: 50%;
+    transition: translate(-50%,-50%); */
+    background: #34495e;
+    width: 1000px;
+    height: 700px;
+    max-width: 1000px;
     min-width: 500px;
-    height: 500px;
+    
     border-radius: 20px;
-    margin-top: 100px;
+    margin-top: 50px;
+    margin-left: 350px;
     color: #fff;
-    overflow: scroll;
+    border: 1px solid #3498db;
+}
+.toDo {
+    width: 100%;
+    height: 100%;
+    background: #2c3e50;
+}
+
+.toDo .toDo__button button {
+    margin: 20px 20px;
+    font-size: 30px;
+    background: none;
+    border: none;
+    outline: none;
+    font-weight: 500;
+    color: #fff;
 }
 
 .header__icon {
@@ -22,6 +43,31 @@
     border: 1px solid #fff;
     color: #fff;
     cursor: pointer;
+}
+
+form .form__input{
+        position: relative;
+        border-bottom: 2px solid #adadad;
+        margin-left: 30px;
+}
+
+input {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: none;
+    color: #fff;
+    padding: 20px;
+    font-size: 16px;
+}
+
+.header__icon button {
+    border: none;
+    outline: none;
+    background: none;
+    font-size: 20px;
+    font-weight: 700;
+    color: #3498db;
 }
 
 .header__table {
@@ -48,6 +94,26 @@
 }
 
 .header__table table tr:hover {
-    background-color: black;
+    background-color: #2c3e50;
     transition: 0.5s background-color;
+}
+
+tbody button {
+    
+    background: none;
+    color: white;
+    border: 1px solid #3498db;
+    padding: 10px 5px;
+    margin-left: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+tbody button:hover {
+    background: #34495e;
+}
+
+.completed {
+    text-decoration: line-through;
+    opacity: 0.5s;
 }
