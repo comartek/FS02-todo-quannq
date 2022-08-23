@@ -12,7 +12,7 @@
   
   .container-login h1 {
     text-align: center;
-    padding-top: 20px;
+    padding-top: 10px ;
     color: #fff;
   }
   
@@ -35,5 +35,22 @@
     font-size: 16px;
     color: #fff;
   }
-  
+
+  .button__v2 {
+    text-align: center;
+    margin-top: 10px;
+    
+  }
+
+  .button__v2 button {
+    border: none;
+    background: none;
+    color: #fff;
+  }
+
+  .button__v2 button p {
+    color: #fff;
+    font-size: 16px;
+    
+  }
   

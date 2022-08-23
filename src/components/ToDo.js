@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./ToDo.css";
@@ -8,14 +8,15 @@ const ToDo = () => {
   const token = localStorage.getItem("token");
 
   const [enterContent, setEnterContent] = useState("");
-  const [enterDate, setEnterDate] = useState("");
 
   const [storeValue, setStoreValue] = useState([]);
 
   const [edit, setEdit] = useState([]);
+  console.log(edit);
+  //const [editComplete, setEditComplete] = useState(false);
   const [taskSuccess, setTaskSuccess] = useState([]);
 
-  const getTask = () => {
+  const getTask = useCallback(() => {
     axios
       .get("https://api-nodejs-todolist.herokuapp.com/task", {
         headers: {
@@ -24,12 +25,12 @@ const ToDo = () => {
         },
       })
       .then((res) => {
-        console.log(res);
+        console.log(res.data);
         setStoreValue(res.data.data);
       });
-  };
+  }, [token]);
 
-  const getTaskCompleted = () => {
+  const getTaskByCompleted = useCallback(() => {
     axios
       .get("https://api-nodejs-todolist.herokuapp.com/task?completed=true", {
         headers: {
@@ -41,10 +42,15 @@ const ToDo = () => {
         console.log(res);
         setTaskSuccess(res.data.data);
       });
-  };
+  }, [token]);
+
+  useEffect(() => {
+    getTask();
+    getTaskByCompleted();
+  }, [getTask, getTaskByCompleted]);
 
   const addTaskHandler = () => {
-    if (enterContent.length === 0 || enterDate.length === 0) {
+    if (enterContent.length === 0) {
       alert("Can not add emty item");
     } else {
       axios
@@ -61,11 +67,9 @@ const ToDo = () => {
           }
         )
         .then((res) => {
-          console.log(res);
           console.log(res.data);
-          setStoreValue([...storeValue, res.data.data]);
+          setStoreValue((prev) => [res.data.data, ...prev]);
           setEnterContent("");
-          setEnterDate("");
         });
     }
   };
@@ -78,7 +82,7 @@ const ToDo = () => {
   const deleteItemHandler = (itemState) => () => {
     axios
       .delete(
-        `https://api-nodejs-todolist.herokuapp.com/task/${itemState.ID}`,
+        `https://api-nodejs-todolist.herokuapp.com/task/${itemState._id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -87,24 +91,47 @@ const ToDo = () => {
         }
       )
       .then((res) => {
-        console.log(res);
+        console.log(res.data);
         getTask();
-        getTaskCompleted();
+        getTaskByCompleted();
       });
 
     console.log(itemState);
-    const currentState = storeValue.filter((item) => item.ID !== itemState.ID);
+    const currentState = storeValue.filter(
+      (item) => item._id !== itemState._id
+    );
     setStoreValue(currentState);
   };
 
   const editItemHandler = (itemState) => () => {
     let isEmtyObj = Object.keys(edit).length === 0;
-    if (isEmtyObj === false && edit.ID === itemState.ID) {
+
+    axios
+      .put(
+        `https://api-nodejs-todolist.herokuapp.com/task/${itemState._id}`,
+        {
+          description: edit,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then((res) => {
+        console.log(res.data);
+        getTask();
+      });
+
+    if (isEmtyObj === false && edit._id === itemState._id) {
       // thay doi gia tri cua doi tuong trong mang, update lai gia tri khi an nut edit
       let storeValueCopy = [...storeValue];
-      let objIndex = storeValueCopy.findIndex((obj) => obj.ID == itemState.ID);
+      let objIndex = storeValueCopy.findIndex(
+        (obj) => obj._id === itemState._id
+      );
 
-      storeValueCopy[objIndex].Content = edit.Content;
+      storeValueCopy[objIndex].description = edit.description;
       setStoreValue(storeValueCopy);
       setEdit({});
       return;
@@ -114,38 +141,57 @@ const ToDo = () => {
 
   const handlerEditItemStore = (e) => {
     let editTodoCopy = { ...edit };
-    editTodoCopy.Content = e.target.value;
+    editTodoCopy.description = e.target.value;
     setEdit(editTodoCopy);
   };
 
   const doneItemHandler = (itemState) => () => {
     // const doneItem = storeValue.map((item) => )
-    setStoreValue(
-      storeValue.map((item) => {
-        if (item.id === itemState.id) {
-          return {
-            ...item,
-            completed: !item.completed,
-          };
+    // setStoreValue(
+    //   storeValue.map((item) => {
+    //     if (item._id === itemState._id) {
+    //       return {
+    //         ...item,
+    //         completed: !item.completed,
+    //       };
+    //     }
+    //     return item;
+    //   })
+    // );
+
+    axios
+      .put(
+        `https://api-nodejs-todolist.herokuapp.com/task/${itemState._id}`,
+        {
+          completed: true,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         }
-        return item;
-      })
-    );
+      )
+      .then((res) => {
+        getTask();
+        getTaskByCompleted();
+      });
+
+    alert("Tinh nang nay dang chua biet css nhu nao de the hien task da xong");
   };
 
   let isEmtyObj = Object.keys(edit).length === 0;
-  console.log("emty khong", isEmtyObj);
+  console.log(" ham input co trong khong", isEmtyObj);
 
-  useEffect(() => {
-    getTask();
-    getTaskCompleted();
-  }, []);
+  console.log(storeValue);
 
   return (
     <div className="toDo">
       <div className="toDo__button">
         <button onClick={userLogout}>Logout</button>
+        <button onClick={() => navigate("/profile")}>User Profile</button>
       </div>
+
       <div className="header">
         <div className="header__icon">
           <div className="header__input">
@@ -160,15 +206,6 @@ const ToDo = () => {
                 />
                 <span></span>
               </span>
-              <span className="form__input">
-                <input
-                  type="date"
-                  id="date"
-                  value={enterDate}
-                  onChange={(e) => setEnterDate(e.target.value)}
-                />
-                <span></span>
-              </span>
             </form>
           </div>
           <button onClick={addTaskHandler}>ADD ITEM</button>
@@ -179,7 +216,6 @@ const ToDo = () => {
               <tr>
                 <th>ID</th>
                 <th>Content</th>
-                <th>Date</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -190,36 +226,28 @@ const ToDo = () => {
                     <td>{index + 1}</td>
 
                     {isEmtyObj === true ? (
-                      <td
-                        className={`todo-item ${storeValue.completed} ? 'completed' : '' `}
-                      >
-                        {st.Content}
-                      </td>
+                      <td>{st.description}</td>
                     ) : (
                       <>
-                        {edit.ID === st.ID ? (
+                        {edit._id === st._id ? (
                           <td>
                             <input
-                              value={edit.Content}
+                              value={edit.description}
                               onChange={(e) => handlerEditItemStore(e)}
                             />
+                            {/* handlerEditItemStore */}
                           </td>
                         ) : (
-                          <td
-                            className={`todo-item ${storeValue.completed} ? 'completed' : '' `}
-                          >
-                            {st.Content}
-                          </td>
+                          <td>{st.description}</td>
                         )}
                       </>
                     )}
 
-                    <td>{st.Date}</td>
                     <td>
                       <button onClick={doneItemHandler(st)}>Done</button>
                       <button onClick={deleteItemHandler(st)}>Remove</button>
                       <button onClick={editItemHandler(st)}>
-                        {isEmtyObj === false && edit.ID === st.ID
+                        {isEmtyObj === false && edit._id === st._id
                           ? "Save"
                           : "Edit"}
                       </button>

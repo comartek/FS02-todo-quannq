@@ -23,20 +23,29 @@ const Register = () => {
     e.preventDefault();
 
     //const { name, email, password, age } = user;
-
-    axios
-      .post("https://api-nodejs-todolist.herokuapp.com/user/register", {
-        name: name,
-        email: email,
-        password: password,
-        age: age,
-      })
-      .then((res) => {
-        console.log(res);
-        console.log(res.data);
-        navigate("/login");
-        localStorage.setItem("token", res.data.token);
-      });
+    if (
+      name.length === 0 ||
+      email.length === 0 ||
+      password.length === 0 ||
+      age.length === 0
+    ) {
+      alert("Vui long nhap day du thong tin ben duoi");
+    } else {
+      axios
+        .post("https://api-nodejs-todolist.herokuapp.com/user/register", {
+          name: name,
+          email: email,
+          password: password,
+          age: age,
+        })
+        .then((res) => {
+          console.log(res);
+          console.log(res.data);
+          navigate("/login");
+          localStorage.setItem("token", res.data.token);
+          localStorage.setItem("user_login", res.data.data);
+        });
+    }
   };
 
   return (
@@ -84,7 +93,9 @@ const Register = () => {
         <div className="signup">
           Not a new member?
           <button>
-            <NavLink to="/login">Sign up</NavLink>
+            <NavLink to="/login">
+              <p>Sign up</p>
+            </NavLink>
           </button>
         </div>
       </form>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, NavLink } from "react-router-dom";
 import axios from "axios";
 
 import "./Login.css";
@@ -8,28 +8,28 @@ import "./Login.css";
 const Login = () => {
   const navigate = useNavigate();
 
-  const [user, setUser] = useState({
-    email: "",
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-    password: "",
-  });
-  //const [data, setData] = useState([]);
+  useEffect(() => {
+    function loginStore() {
+      const getTokenRegister = localStorage.getItem("token");
+      if (getTokenRegister) {
+        navigate("/todo");
+      } else {
+        navigate("/");
+      }
+    }
 
-  const getData = (e) => {
-    const { value, name } = e.target;
+    window.addEventListener("storage", loginStore);
 
-    setUser(() => {
-      return {
-        ...user,
-        [name]: value,
-      };
-    });
-  };
+    return () => {
+      window.removeEventListener("storage", loginStore);
+    };
+  }, []);
 
   const addData = (e) => {
     e.preventDefault();
-
-    const { email, password } = user;
 
     if (email === "" || password === "") {
       alert("Chua nhap email hoac password");
@@ -40,22 +40,13 @@ const Login = () => {
           password: password,
         })
         .then((res) => {
-          console.log(res);
           console.log(res.data);
           localStorage.setItem("token", res.data.token);
-          navigate("/todo");
-        });
+          //localStorage.setItem("user_login", res.data.data);
+        })
+        .then(() => setTimeout(() => navigate("/todo"), 3000));
     }
   };
-
-  useEffect(() => {
-    const getTokenRegister = localStorage.getItem("token");
-    if (getTokenRegister) {
-      navigate("/todo");
-    } else {
-      navigate("/");
-    }
-  }, [navigate]);
 
   return (
     <div className="container-login">
@@ -66,7 +57,7 @@ const Login = () => {
             type="text"
             id="name"
             placeholder="Username"
-            onChange={getData}
+            onChange={(e) => setEmail(e.target.value)}
           />
           <span></span>
         </div>
@@ -75,11 +66,18 @@ const Login = () => {
             type="password"
             id="password"
             placeholder="Password"
-            onChange={getData}
+            onChange={(e) => setPassword(e.target.value)}
           />
           <span></span>
         </div>
         <input type="submit" value="Login" />
+        <div className="button__v2">
+          <button>
+            <NavLink to="/">
+              <p>Chua co tai khoan?</p>
+            </NavLink>
+          </button>
+        </div>
       </form>
     </div>
   );
