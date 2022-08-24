@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import PaginatedItems from "./PaginatedItems";
 import "./ToDo.css";
 
-const ToDo = () => {
+const ToDo = ({ currentItems }) => {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
@@ -12,6 +13,7 @@ const ToDo = () => {
   const [storeValue, setStoreValue] = useState([]);
 
   const [edit, setEdit] = useState([]);
+  const itemsPerPage = 8;
   console.log(edit);
   //const [editComplete, setEditComplete] = useState(false);
   const [taskSuccess, setTaskSuccess] = useState([]);
@@ -146,19 +148,6 @@ const ToDo = () => {
   };
 
   const doneItemHandler = (itemState) => () => {
-    // const doneItem = storeValue.map((item) => )
-    // setStoreValue(
-    //   storeValue.map((item) => {
-    //     if (item._id === itemState._id) {
-    //       return {
-    //         ...item,
-    //         completed: !item.completed,
-    //       };
-    //     }
-    //     return item;
-    //   })
-    // );
-
     axios
       .put(
         `https://api-nodejs-todolist.herokuapp.com/task/${itemState._id}`,
@@ -235,7 +224,6 @@ const ToDo = () => {
                               value={edit.description}
                               onChange={(e) => handlerEditItemStore(e)}
                             />
-                            {/* handlerEditItemStore */}
                           </td>
                         ) : (
                           <td>{st.description}</td>
@@ -258,6 +246,7 @@ const ToDo = () => {
             </tbody>
           </table>
         </div>
+        {/* <PaginatedItems storeValue={storeValue} itemsPerPage={itemsPerPage} /> */}
       </div>
     </div>
   );

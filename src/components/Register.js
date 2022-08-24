@@ -7,13 +7,6 @@ import "./Register.css";
 const Register = () => {
   const navigate = useNavigate();
 
-  // const [user, setUser] = useState({
-  //   name: "",
-  //   email: "",
-  //   password: "",
-  //   age: "",
-  // });
-
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,7 +15,6 @@ const Register = () => {
   const addData = async (e) => {
     e.preventDefault();
 
-    //const { name, email, password, age } = user;
     if (
       name.length === 0 ||
       email.length === 0 ||
@@ -38,6 +30,7 @@ const Register = () => {
           password: password,
           age: age,
         })
+        .then(() => alert("Dang ky thanh cong"))
         .then((res) => {
           console.log(res);
           console.log(res.data);

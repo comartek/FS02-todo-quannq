@@ -44,7 +44,8 @@ const Login = () => {
           localStorage.setItem("token", res.data.token);
           //localStorage.setItem("user_login", res.data.data);
         })
-        .then(() => setTimeout(() => navigate("/todo"), 3000));
+        .then(() => alert("Dang nhap thanh cong"))
+        .then(() => setTimeout(() => navigate("/todo"), 1000));
     }
   };
 
