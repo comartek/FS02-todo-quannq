@@ -1,4 +1,4 @@
-.container-login {
+.container__login {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -10,23 +10,23 @@
     box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.05);
   }
   
-  .container-login h1 {
+  .container__login h1 {
     text-align: center;
     padding-top: 10px ;
     color: #fff;
   }
   
-  .container-login form {
+  .container__login form {
     padding: 0 40px;
   }
   
-  form .form-control-login {
+  form .form__control__login {
     position: relative;
     border-bottom: 2px solid #adadad;
     margin: 40px 0;
   }
   
-  .form-control-login input {
+  .form__control__login input {
     width: 100%;
     height: 40px;
     border: none;

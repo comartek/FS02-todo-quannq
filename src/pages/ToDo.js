@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import PaginatedItems from "./PaginatedItems";
+import PaginatedItems from "../components/PaginatedItems";
 import "./ToDo.css";
 
 const ToDo = ({ currentItems }) => {
@@ -9,14 +9,16 @@ const ToDo = ({ currentItems }) => {
   const token = localStorage.getItem("token");
 
   const [enterContent, setEnterContent] = useState("");
-
   const [storeValue, setStoreValue] = useState([]);
-
-  const [edit, setEdit] = useState([]);
+  //const [editItem, setEditItem] = useState([]);
+  const [edit, setEdit] = useState({});
   const itemsPerPage = 8;
-  console.log(edit);
+
   //const [editComplete, setEditComplete] = useState(false);
   const [taskSuccess, setTaskSuccess] = useState([]);
+
+  console.log(`Hien thi edit : `, edit);
+  console.log(`Hien thi storevalue : `, storeValue);
 
   const getTask = useCallback(() => {
     axios
@@ -105,6 +107,29 @@ const ToDo = ({ currentItems }) => {
     setStoreValue(currentState);
   };
 
+  // const editItemTwo = async (id) => () => {
+  //   const updateContent = { description: editItem };
+  //   try {
+  //     const response = axios.put(
+  //       `https://api-nodejs-todolist.herokuapp.com/task/${id}`,
+  //       updateContent,
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       }
+  //     );
+  //     setStoreValue(
+  //       storeValue.map((store) =>
+  //         store.id === id ? { ...response.data } : store
+  //       )
+  //     );
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+
   const editItemHandler = (itemState) => () => {
     let isEmtyObj = Object.keys(edit).length === 0;
 
@@ -124,6 +149,7 @@ const ToDo = ({ currentItems }) => {
       .then((res) => {
         console.log(res.data);
         getTask();
+        getTaskByCompleted();
       });
 
     if (isEmtyObj === false && edit._id === itemState._id) {
@@ -166,13 +192,11 @@ const ToDo = ({ currentItems }) => {
         getTaskByCompleted();
       });
 
-    alert("Tinh nang nay dang chua biet css nhu nao de the hien task da xong");
+    alert("Done");
   };
 
   let isEmtyObj = Object.keys(edit).length === 0;
   console.log(" ham input co trong khong", isEmtyObj);
-
-  console.log(storeValue);
 
   return (
     <div className="toDo">
@@ -230,6 +254,17 @@ const ToDo = ({ currentItems }) => {
                         )}
                       </>
                     )}
+
+                    {/* {editItem && (
+                      <td>
+                        <input
+                          type="text"
+                          value={editItem}
+                          onChange={(e) => setEditItem(e.target.value)}
+                        />
+                      </td>
+                    )}
+                    {!editItem && <td>{st.description}</td>} */}
 
                     <td>
                       <button onClick={doneItemHandler(st)}>Done</button>

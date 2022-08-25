@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { Routes, Route } from "react-router-dom";
 
 import "./App.css";
-import Register from "./components/Register";
-import ToDo from "./components/ToDo";
-import Login from "./components/Login";
-import UserProfile from "./components/UserProfile";
+import Register from "./pages/Register";
+import ToDo from "./pages/ToDo";
+import Login from "./pages/Login";
+import UserProfile from "./pages/UserProfile";
 
 function App() {
   return (

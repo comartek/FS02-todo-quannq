@@ -1,0 +1,15 @@
+div {
+    position: relative;
+    border-bottom: 2px solid #adadad;
+    margin: 40px 0;
+}
+
+div .from__control {
+    width: 100%;
+    height: 40px;
+    border: none;
+    background: none;
+    outline: none;
+    font-size: 16px;
+    color: #fff;
+}

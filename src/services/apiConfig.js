@@ -1,13 +1,11 @@
 import axios from "axios";
-
-const baseUrl = "https://api-nodejs-todolist.herokuapp.com";
-
+import instance from "./axiosInstance";
 // Register
 
 export let register = (name, email, password, age, navigate) => {
   const options = {
     method: "POST",
-    url: `${baseUrl}/user/register`,
+    url: `${instance.baseUrl}/user/register`,
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
@@ -33,7 +31,7 @@ export let register = (name, email, password, age, navigate) => {
 export let login = (email, password, navigate) => {
   const options = {
     method: "POST",
-    url: `${baseUrl}/user/login`,
+    url: `${instance.baseUrl}/user/login`,
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
@@ -58,7 +56,7 @@ export let login = (email, password, navigate) => {
 export let logout = (navigate) => {
   const options = {
     method: "POST",
-    url: `${baseUrl}/user/logout`,
+    url: `${instance.baseUrl}/user/logout`,
     headers: { Authorization: `${localStorage.getItem("token")}` },
   };
 
@@ -76,7 +74,7 @@ export let logout = (navigate) => {
 export let getAllTask = (setTaskList) => {
   const options = {
     method: "GET",
-    url: `${baseUrl}/task`,
+    url: `${instance.baseUrl}/task`,
     headers: {
       "Content-Type": "application/json",
       Authorization: `${localStorage.getItem("token")}`,
@@ -93,16 +91,10 @@ export let getAllTask = (setTaskList) => {
 
 // ADD Task
 
-export let addTask = (
-  content
-  //dispatchSetTodos,
-  //updateCount,
-  //count,
-  //dispatchCurPage
-) => {
+export let addTask = (content) => {
   const options = {
     method: "POST",
-    url: `${baseUrl}/task`,
+    url: `${instance.baseUrl}/task`,
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -116,45 +108,14 @@ export let addTask = (
     .request(options)
     .then((res) => {
       console.log(res.data);
-      // getTaskByPagination(10, count * 10 - 10, dispatchSetTodos);
-      //updateCount();
-      //dispatchCurPage(count);
     })
-    .then(() => {
-      //console.log(count);
-    })
-    .catch((err) => console.log(err.response.data));
-};
 
-// delete task
-
-export let deleteTask = (id, setTask, count, dispatchCurPage) => {
-  const options = {
-    method: "DELETE",
-    url: `${baseUrl}/task/${id}`,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-  };
-
-  axios
-    .request(options)
-    .then((res) => {
-      console.log(res.data);
-      //getTaskByPagination(10, count * 10 - 10, setTask);
-    })
-    .then(() => {
-      getAllTask();
-      //dispatchCurPage(count);
-      //console.log(count);
-    })
     .catch((err) => console.log(err.response.data));
 };
 
 // update task
 
-export let updateTask = (id, completed, curPage, setTask) => {
+export let updateTask = (id, completed) => {
   let data =
     completed === true || completed === false
       ? { completed: completed }
@@ -163,7 +124,7 @@ export let updateTask = (id, completed, curPage, setTask) => {
   console.log({ id, completed });
   const options = {
     method: "PUT",
-    url: `${baseUrl}/task/${id}`,
+    url: `${instance.baseUrl}/task/${id}`,
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -174,9 +135,30 @@ export let updateTask = (id, completed, curPage, setTask) => {
   axios
     .request(options)
     .then((res) => {
-      // setTask(res.data.data);
-      //getTaskByPagination(10, curPage * 10 - 10, setTask);
       console.log(res.data);
+    })
+    .catch((err) => console.log(err.response.data));
+};
+
+// delete task
+
+export let deleteTask = (id) => {
+  const options = {
+    method: "DELETE",
+    url: `${instance.baseUrl}/task/${id}`,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  };
+
+  axios
+    .request(options)
+    .then((res) => {
+      console.log(res.data);
+    })
+    .then(() => {
+      getAllTask();
     })
     .catch((err) => console.log(err.response.data));
 };

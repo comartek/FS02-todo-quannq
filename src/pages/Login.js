@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 
 import { useNavigate, NavLink } from "react-router-dom";
 import axios from "axios";
+import Input from "../components/Input";
 
 import "./Login.css";
 
@@ -50,10 +51,10 @@ const Login = () => {
   };
 
   return (
-    <div className="container-login">
+    <div className="container__login">
       <h1>Login</h1>
       <form onSubmit={addData}>
-        <div className="form-control-login">
+        <div className="form__control__login">
           <input
             type="text"
             id="name"
@@ -62,7 +63,7 @@ const Login = () => {
           />
           <span></span>
         </div>
-        <div className="form-control-login">
+        <div className="form__control__login">
           <input
             type="password"
             id="password"
