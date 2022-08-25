@@ -76,7 +76,7 @@ const Login = () => {
         <div className="button__v2">
           <button>
             <NavLink to="/">
-              <p>Chua co tai khoan?</p>
+              <p>or Create an account</p>
             </NavLink>
           </button>
         </div>

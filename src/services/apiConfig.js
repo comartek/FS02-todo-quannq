@@ -1,8 +1,9 @@
 import axios from "axios";
 import instance from "./axiosInstance";
+
 // Register
 
-export let register = (name, email, password, age, navigate) => {
+export let register = (name, email, password, age) => {
   const options = {
     method: "POST",
     url: `${instance.baseUrl}/user/register`,
@@ -57,7 +58,7 @@ export let logout = (navigate) => {
   const options = {
     method: "POST",
     url: `${instance.baseUrl}/user/logout`,
-    headers: { Authorization: `${localStorage.getItem("token")}` },
+    headers: { Authorization: ` Bearer ${localStorage.getItem("token")}` },
   };
 
   axios
@@ -77,7 +78,7 @@ export let getAllTask = (setTaskList) => {
     url: `${instance.baseUrl}/task`,
     headers: {
       "Content-Type": "application/json",
-      Authorization: `${localStorage.getItem("token")}`,
+      Authorization: ` Bearer ${localStorage.getItem("token")}`,
     },
   };
 
@@ -142,7 +143,7 @@ export let updateTask = (id, completed) => {
 
 // delete task
 
-export let deleteTask = (id) => {
+export let deleteTask = (id, getAllTask) => {
   const options = {
     method: "DELETE",
     url: `${instance.baseUrl}/task/${id}`,

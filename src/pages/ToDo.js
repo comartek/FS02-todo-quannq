@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import PaginatedItems from "../components/PaginatedItems";
+//import PaginatedItems from "../components/PaginatedItems";
 import "./ToDo.css";
 
 const ToDo = ({ currentItems }) => {
@@ -10,11 +10,11 @@ const ToDo = ({ currentItems }) => {
 
   const [enterContent, setEnterContent] = useState("");
   const [storeValue, setStoreValue] = useState([]);
-  //const [editItem, setEditItem] = useState([]);
-  const [edit, setEdit] = useState({});
-  const itemsPerPage = 8;
 
-  //const [editComplete, setEditComplete] = useState(false);
+  const [edit, setEdit] = useState(""); // editting Text
+  //const itemsPerPage = 8;
+  const [editing, setEditing] = useState(false); // todo editing
+
   const [taskSuccess, setTaskSuccess] = useState([]);
 
   console.log(`Hien thi edit : `, edit);
@@ -97,7 +97,9 @@ const ToDo = ({ currentItems }) => {
       .then((res) => {
         console.log(res.data);
         getTask();
-        getTaskByCompleted();
+      })
+      .catch((err) => {
+        console.log(err);
       });
 
     console.log(itemState);
@@ -107,70 +109,30 @@ const ToDo = ({ currentItems }) => {
     setStoreValue(currentState);
   };
 
-  // const editItemTwo = async (id) => () => {
-  //   const updateContent = { description: editItem };
-  //   try {
-  //     const response = axios.put(
-  //       `https://api-nodejs-todolist.herokuapp.com/task/${id}`,
-  //       updateContent,
-  //       {
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       }
-  //     );
-  //     setStoreValue(
-  //       storeValue.map((store) =>
-  //         store.id === id ? { ...response.data } : store
-  //       )
-  //     );
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
+  // EDIT
 
-  const editItemHandler = (itemState) => () => {
-    let isEmtyObj = Object.keys(edit).length === 0;
-
-    axios
-      .put(
-        `https://api-nodejs-todolist.herokuapp.com/task/${itemState._id}`,
-        {
-          description: edit,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+  const editItemTwo = (itemState) => () => {
+    try {
+      axios
+        .put(
+          `https://api-nodejs-todolist.herokuapp.com/task/${itemState}`,
+          {
+            description: edit,
           },
-        }
-      )
-      .then((res) => {
-        console.log(res.data);
-        getTask();
-        getTaskByCompleted();
-      });
-
-    if (isEmtyObj === false && edit._id === itemState._id) {
-      // thay doi gia tri cua doi tuong trong mang, update lai gia tri khi an nut edit
-      let storeValueCopy = [...storeValue];
-      let objIndex = storeValueCopy.findIndex(
-        (obj) => obj._id === itemState._id
-      );
-
-      storeValueCopy[objIndex].description = edit.description;
-      setStoreValue(storeValueCopy);
-      setEdit({});
-      return;
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+        .then((res) => {
+          setEditing(null);
+          getTask();
+        });
+    } catch (error) {
+      console.log(error);
     }
-    setEdit(itemState);
-  };
-
-  const handlerEditItemStore = (e) => {
-    let editTodoCopy = { ...edit };
-    editTodoCopy.description = e.target.value;
-    setEdit(editTodoCopy);
   };
 
   const doneItemHandler = (itemState) => () => {
@@ -189,7 +151,8 @@ const ToDo = ({ currentItems }) => {
       )
       .then((res) => {
         getTask();
-        getTaskByCompleted();
+        setStoreValue(res.data);
+        console.log(res.data);
       });
 
     alert("Done");
@@ -238,42 +201,41 @@ const ToDo = ({ currentItems }) => {
                   <tr key={index}>
                     <td>{index + 1}</td>
 
-                    {isEmtyObj === true ? (
-                      <td>{st.description}</td>
+                    {editing === st._id ? (
+                      <>
+                        <td>
+                          <input
+                            type="text"
+                            value={edit}
+                            onChange={(e) => setEdit(e.target.value)}
+                          />
+                        </td>
+                        <td>
+                          <button onClick={editItemTwo(st._id)}>Save</button>
+                        </td>
+                      </>
                     ) : (
                       <>
-                        {edit._id === st._id ? (
-                          <td>
-                            <input
-                              value={edit.description}
-                              onChange={(e) => handlerEditItemStore(e)}
-                            />
-                          </td>
-                        ) : (
-                          <td>{st.description}</td>
-                        )}
+                        <td
+                          style={{
+                            textDecoration: st.completed
+                              ? "line-through"
+                              : "none",
+                          }}
+                        >
+                          {st.description}
+                        </td>
+                        <td>
+                          <button onClick={() => setEditing(st._id)}>
+                            Edit
+                          </button>
+                          <button onChange={doneItemHandler(st)}>Done</button>
+                        </td>
                       </>
                     )}
 
-                    {/* {editItem && (
-                      <td>
-                        <input
-                          type="text"
-                          value={editItem}
-                          onChange={(e) => setEditItem(e.target.value)}
-                        />
-                      </td>
-                    )}
-                    {!editItem && <td>{st.description}</td>} */}
-
                     <td>
-                      <button onClick={doneItemHandler(st)}>Done</button>
                       <button onClick={deleteItemHandler(st)}>Remove</button>
-                      <button onClick={editItemHandler(st)}>
-                        {isEmtyObj === false && edit._id === st._id
-                          ? "Save"
-                          : "Edit"}
-                      </button>
                     </td>
                   </tr>
                 );

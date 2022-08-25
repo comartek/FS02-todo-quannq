@@ -84,10 +84,10 @@ const Register = () => {
 
         <input type="submit" value="Register" />
         <div className="signup">
-          Not a new member?
+          Already have an account?
           <button>
             <NavLink to="/login">
-              <p>Sign up</p>
+              <p>Sign in</p>
             </NavLink>
           </button>
         </div>
