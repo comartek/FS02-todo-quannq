@@ -1,38 +1,38 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import * as apiServices from "../services/apiServices";
 //import PaginatedItems from "../components/PaginatedItems";
-import "./ToDo.css";
 
-const ToDo = ({ currentItems }) => {
+import "./ToDo.css";
+import TodoComponent from "../components/TodoComponent";
+
+const ToDo = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
   const [enterContent, setEnterContent] = useState("");
   const [storeValue, setStoreValue] = useState([]);
 
-  const [edit, setEdit] = useState(""); // editting Text
-  //const itemsPerPage = 8;
-  const [editing, setEditing] = useState(false); // todo editing
+  const [edit, setEdit] = useState("");
 
+  const [editing, setEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [taskSuccess, setTaskSuccess] = useState([]);
 
   console.log(`Hien thi edit : `, edit);
   console.log(`Hien thi storevalue : `, storeValue);
 
-  const getTask = useCallback(() => {
-    axios
-      .get("https://api-nodejs-todolist.herokuapp.com/task", {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => {
-        console.log(res.data);
-        setStoreValue(res.data.data);
-      });
-  }, [token]);
+  const getFullData = useCallback(async () => {
+    setIsLoading(true);
+
+    let results = await apiServices.getTask();
+    setStoreValue(results.data);
+
+    setIsLoading(false);
+  }, []);
+
+  // get task complete
 
   const getTaskByCompleted = useCallback(() => {
     axios
@@ -45,43 +45,34 @@ const ToDo = ({ currentItems }) => {
       .then((res) => {
         console.log(res);
         setTaskSuccess(res.data.data);
-      });
+      })
+      .catch((err) => console.log(err));
   }, [token]);
 
   useEffect(() => {
-    getTask();
+    getFullData();
     getTaskByCompleted();
-  }, [getTask, getTaskByCompleted]);
+  }, [getFullData, getTaskByCompleted]);
 
-  const addTaskHandler = () => {
+  // add task
+  const addTaskHandler = async () => {
     if (enterContent.length === 0) {
       alert("Can not add emty item");
     } else {
-      axios
-        .post(
-          `https://api-nodejs-todolist.herokuapp.com/task`,
-          {
-            description: enterContent,
-          },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        )
-        .then((res) => {
-          console.log(res.data);
-          setStoreValue((prev) => [res.data.data, ...prev]);
-          setEnterContent("");
-        });
+      let results = await apiServices.addTask(enterContent);
+      setStoreValue((prev) => [results.data.data, ...prev]);
+      setEnterContent("");
     }
   };
+
+  // log out
 
   const userLogout = () => {
     localStorage.removeItem("user_login");
     navigate("/login");
   };
+
+  // delete item
 
   const deleteItemHandler = (itemState) => () => {
     axios
@@ -96,7 +87,7 @@ const ToDo = ({ currentItems }) => {
       )
       .then((res) => {
         console.log(res.data);
-        getTask();
+        getFullData();
       })
       .catch((err) => {
         console.log(err);
@@ -109,33 +100,47 @@ const ToDo = ({ currentItems }) => {
     setStoreValue(currentState);
   };
 
+  // const deleteItemHandler = async (itemState) => {
+  //   let results = await apiServices.deleteTask(itemState._id);
+  //   getFullData();
+  //   const currentState = storeValue.filter(
+  //     (item) => item._id !== itemState._id
+  //   );
+  //   setStoreValue(results);
+  // };
+
   // EDIT
 
-  const editItemTwo = (itemState) => () => {
-    try {
-      axios
-        .put(
-          `https://api-nodejs-todolist.herokuapp.com/task/${itemState}`,
-          {
-            description: edit,
+  const editItemHandler = (itemState) => () => {
+    axios
+      .put(
+        `https://api-nodejs-todolist.herokuapp.com/task/${itemState}`,
+        {
+          description: edit,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        )
-        .then((res) => {
-          setEditing(null);
-          getTask();
-        });
-    } catch (error) {
-      console.log(error);
-    }
+        }
+      )
+      .then(() => {
+        setEditing(null);
+        getFullData();
+      })
+      .catch((err) => console.log(err));
   };
 
-  const doneItemHandler = (itemState) => () => {
+  // const editItemHandler = async (itemState) => {
+  //   await apiServices.editTask(itemState, edit);
+  //   setEditing(null);
+  //   getFullData();
+  // };
+
+  // change status item
+
+  const doneItemHandler = (itemState) => {
     axios
       .put(
         `https://api-nodejs-todolist.herokuapp.com/task/${itemState._id}`,
@@ -150,102 +155,32 @@ const ToDo = ({ currentItems }) => {
         }
       )
       .then((res) => {
-        getTask();
-        setStoreValue(res.data);
-        console.log(res.data);
-      });
-
-    alert("Done");
+        getFullData();
+        //setStoreValue(res.data);
+        console.log(`Hien thi xem nay`, res.data);
+      })
+      .catch((err) => console.log(err));
   };
 
-  let isEmtyObj = Object.keys(edit).length === 0;
-  console.log(" ham input co trong khong", isEmtyObj);
-
   return (
-    <div className="toDo">
-      <div className="toDo__button">
-        <button onClick={userLogout}>Logout</button>
-        <button onClick={() => navigate("/profile")}>User Profile</button>
-      </div>
-
-      <div className="header">
-        <div className="header__icon">
-          <div className="header__input">
-            <form>
-              <span className="form__input">
-                <input
-                  type="text"
-                  value={enterContent}
-                  id="content"
-                  onChange={(e) => setEnterContent(e.target.value)}
-                  placeholder="Content"
-                />
-                <span></span>
-              </span>
-            </form>
-          </div>
-          <button onClick={addTaskHandler}>ADD ITEM</button>
-        </div>
-        <div className="header__table">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Content</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {storeValue.map((st, index) => {
-                return (
-                  <tr key={index}>
-                    <td>{index + 1}</td>
-
-                    {editing === st._id ? (
-                      <>
-                        <td>
-                          <input
-                            type="text"
-                            value={edit}
-                            onChange={(e) => setEdit(e.target.value)}
-                          />
-                        </td>
-                        <td>
-                          <button onClick={editItemTwo(st._id)}>Save</button>
-                        </td>
-                      </>
-                    ) : (
-                      <>
-                        <td
-                          style={{
-                            textDecoration: st.completed
-                              ? "line-through"
-                              : "none",
-                          }}
-                        >
-                          {st.description}
-                        </td>
-                        <td>
-                          <button onClick={() => setEditing(st._id)}>
-                            Edit
-                          </button>
-                          <button onChange={doneItemHandler(st)}>Done</button>
-                        </td>
-                      </>
-                    )}
-
-                    <td>
-                      <button onClick={deleteItemHandler(st)}>Remove</button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-        {/* <PaginatedItems storeValue={storeValue} itemsPerPage={itemsPerPage} /> */}
-      </div>
-    </div>
+    <>
+      <TodoComponent
+        userLogout={userLogout}
+        navigate={navigate}
+        enterContent={enterContent}
+        setEnterContent={setEnterContent}
+        addTaskHandler={addTaskHandler}
+        storeValue={storeValue}
+        setEdit={setEdit}
+        edit={edit}
+        editItemTwo={editItemHandler}
+        setEditing={setEditing}
+        editing={editing}
+        doneItemHandler={doneItemHandler}
+        deleteItemHandler={deleteItemHandler}
+        isLoading={isLoading}
+      />
+    </>
   );
 };
 
